@@ -50,11 +50,16 @@ def re_var(consts: list, string: str, stop_words=None):
 
 
 def header_in_reg(header, position, dict_of_reg):
-    if type(dict_of_reg[position][0]) == str:
-        _temp_bool = re_var(dict_of_reg[position], header)
+    val = dict_of_reg[position]
+    # Если это обычный список строк
+    if type(val[0]) == str:
+        _temp_bool = re_var(val, header)
+    # Если это сложная структура со стоп-словами
     else:
-        _temp_bool = re_var(dict_of_reg[position][0], header,
-                            dict_of_reg[position][1])
+        consts = val[0]
+        # Проверяем, есть ли второй элемент (стоп-слова), чтобы не было ошибки
+        stop_words = val[1] if len(val) > 1 else None
+        _temp_bool = re_var(consts, header, stop_words)
     return _temp_bool
 
 
@@ -87,7 +92,7 @@ dict_of_reg_value_FCR = {
     'CR_number_int': ['init', 'intern'],
     'Organization': [['init', 'organ'], ['organ', 'intern']],
     'Initiator': [['init'], ['organ', 'intern']],
-    'Initiator_pos': [['init', 'posit']],
+    'Initiator_pos': ['init', 'posit'],
     'Method_justif': [['justification'], ['simple']],
     'Ini_Method_justif': ['just', 'simple', 'meth'],
     'Change_equipment': ['change', 'equip'],
