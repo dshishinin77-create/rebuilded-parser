@@ -1,0 +1,39 @@
+name: Build Windows EXE
+
+# Запускать скрипт при каждом пуше в ветку main или по кнопке вручную
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    # Важно: запускаем именно на Windows!
+    runs-on: windows-latest
+
+    steps:
+    - name: Скачивание кода
+      uses: actions/checkout@v3
+
+    - name: Установка Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11' # Версия Python
+
+    - name: Установка зависимостей
+      run: |
+        python -m pip install --upgrade pip
+        pip install openpyxl pyinstaller
+
+    - name: Сборка EXE файла
+      # Замените recovered.py на реальное имя вашего файла, если оно другое
+      run: pyinstaller --onefile recovered.py
+
+    - name: Загрузка готового EXE
+      uses: actions/upload-artifact@v4
+      with:
+        name: My_Parser_EXE
+        # PyInstaller всегда кладет готовый файл в папку dist
+        path: dist/*.exe
